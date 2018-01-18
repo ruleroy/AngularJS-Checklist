@@ -1,0 +1,238 @@
+a#name{
+	color: white !important;
+}
+
+div.custom-checkbox{
+
+}
+
+.custom-checkbox > [type="checkbox"],
+.custom-checkbox > label{
+	margin-bottom:0px !important;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+.custom-checkbox > [type="checkbox"]:not(:checked),
+.custom-checkbox > [type="checkbox"]:checked {
+	position: absolute;
+	left: -9999px;
+}
+.custom-checkbox > [type="checkbox"]:not(:checked) + label,
+.custom-checkbox > [type="checkbox"]:checked + label {
+	position: relative;
+	padding-left: 22px;
+	cursor: pointer;
+}
+.custom-checkbox > [type="checkbox"]:not(:checked) + label:before,
+.custom-checkbox > [type="checkbox"]:checked + label:before {
+	content: '';
+	position: absolute;
+	left:0; 
+	top: 50%;
+	margin-top:-9px;
+	width: 27px; 
+	height: 27px;
+	border: 1px solid gray;
+	background: #ffffff;
+	border-radius: 2px;
+}
+.custom-checkbox > [type="checkbox"]:not(:checked) + label:after,
+.custom-checkbox > [type="checkbox"]:checked + label:after {
+	font: normal normal normal 22px/1 'Glyphicons Halflings';
+	content: '\e013';
+	position: absolute;
+	top: 50%;
+	margin-top:-7px;
+	left: 2px;
+	color: #94C947;
+	xtransition: all .2s;
+}
+
+.custom-checkbox > [type="checkbox"]:not(:checked) + label:after {
+	opacity: 0;
+	transform: scale(0);
+}
+.custom-checkbox > [type="checkbox"]:checked + label:after {
+	opacity: 1;
+	transform: scale(1);
+}
+
+.custom-checkbox > [type="checkbox"][data-indeterminate] + label:after,
+.custom-checkbox > [type="checkbox"][data-indeterminate] + label:after {
+	content: '\2212';
+	left: 2px;
+	opacity: 1;
+	transform: scale(1);
+}
+
+.custom-checkbox > [type="checkbox"]:disabled:not(:checked) + label:before,
+.custom-checkbox > [type="checkbox"]:disabled:checked + label:before {
+	box-shadow: none;
+	background-color: #eeeeee;
+	border-color: #eeeeee;
+	cursor: not-allowed;
+	opacity: 1;
+	color: #dadada;
+}
+.custom-checkbox > [type="checkbox"]:disabled:checked + label:after {
+	color: #dadada; cursor: not-allowed;
+}
+.custom-checkbox > [type="checkbox"]:disabled + label {
+	color: #aaa; cursor: not-allowed;
+}
+.custom-checkbox > [type="checkbox"]:checked:focus + label:before,
+.custom-checkbox > [type="checkbox"]:not(:checked):focus + label:before {
+	border: 1px solid #66afe9;
+	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
+}
+.custom-checkbox > label:hover:before {
+	border: 1px solid #88D2FF !important;
+}
+.custom-checkbox > [type="checkbox"]:disabled:not(:checked) + label:hover:before,
+.custom-checkbox > [type="checkbox"]:disabled:checked + label:hover:before{
+	border: 1px solid #E4E4E4 !important;
+}
+
+[contenteditable=true]:empty:not(:focus):before{
+	content:attr(data-text);
+}
+
+div:empty:before {
+	content:attr(data-text);
+	color:gray
+}
+
+[contenteditable="true"]:focus::before{
+	content:"";
+	background-color:gray;
+}
+
+[contenteditable="true"]:focus{
+	border-radius: 5px;
+	background-color: white !important;
+
+	border: 1px solid #66afe9;
+	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
+}
+
+tr#checked-true{
+	transition: background-color 0.5s ease;
+	/* background-color: rgba(102, 175, 233, 0.6); */
+	background-color: #e5e5e5;
+}
+
+div#columnText{
+
+	display:block;
+	width: 100%;
+	max-width: 500px;
+	padding: 5px;
+}
+
+input#titleName {
+	padding:5px;
+	color:black;
+
+	border-radius: 5px;
+	background-color: white !important;
+
+	border: 1px solid #66afe9;
+	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
+}
+
+#name > div > div{
+	color:black;
+}
+
+/* Large Devices, Wide Screens */
+@media only screen and (max-width : 1200px) {
+	div#columnText{
+		max-width: 390px;
+	}
+}
+
+/* Medium Devices, Desktops */
+@media only screen and (max-width : 992px) {
+	div#columnText{
+		max-width: 270px;
+	}
+}
+
+/* Small Devices, Tablets */
+@media only screen and (max-width : 768px) {
+	div#columnText{
+		max-width: 150px;
+	}
+}
+
+/* Extra Small Devices, Phones */ 
+@media only screen and (max-width : 480px) {
+	div#columnText{
+		max-width: 100px;
+	}
+}
+
+/* Custom, iPhone Retina */ 
+@media only screen and (max-width : 320px) {
+	div#columnText{
+		max-width: 60px;
+	}
+}
+
+.progress {
+	text-align:center;
+}
+
+.progress-value {
+	position:absolute;
+	color:black;
+	right:0;
+	left:0;
+}
+
+.myHandle {
+	cursor: move !important;
+	position: absolute;
+	right: 45px;
+	top: 10px;
+}
+
+.color-black {
+	background-color: #262626 !important;
+}
+
+.color-blue {
+	background-color: #337AB7 !important;
+}
+
+.color-purple {
+	background-color: #9632b5 !important;
+}
+
+.color-red {
+	background-color: #b53232 !important;
+}
+
+.color-teal {
+	background-color: #32b5aa !important;
+}
+
+.color-green {
+	background-color: #32b53b !important;
+}
+
+.color-gray {
+	background-color: #898989 !important;
+}
+
+.color-yellow {
+	background-color: #EC971F !important;
+}
+
+.panel-primary {
+	border-color: rgba(0, 0, 0, 0.4) !important;
+}

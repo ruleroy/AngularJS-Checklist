@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html ng-app="MyApp">
+<head>
+	<title>Checklist - Roy Vannakittikun</title>
+
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="style.css">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+	<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+	<script src="js/jquery.ui.touch-punch.min.js"></script>
+
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+	<script src="js/ngSetFocus.js"></script>
+	<script src="js/confirm.js"></script>
+	<script type="text/javascript" src="js/sortable.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/ngStorage/0.3.10/ngStorage.min.js"></script>
+
+	<script>
+
+		angular.module('MyApp', ['ngSetFocus', 'confirm', 'ui.sortable', 'ngStorage'])
+		.controller('MainController', function($scope, $localStorage, $sessionStorage) {
+			$scope.$storage = $localStorage.$default({
+				counter: 1,
+				sections: [{ 
+					value: 0,
+					name: 'Title Name',
+					id: 1,
+					color: 'blue',
+					edit: false,
+					counter: 1,
+					totalCounter: 1,
+					checkedCounter: 0,
+					currentPercent: 0,
+					rows: [ { name: 'Row 1', desc: 'Short description.', checked: 'false', index: '1' }]
+				}]
+			});
+
+			$scope.sortableOptions = {
+				handle: '> .myHandle',
+				update: function(e, ui) {
+					var logEntry = $scope.sections.map(function(i){
+						return i.id;
+					}).join(', ');
+					console.log('Update: ' + logEntry);
+				},
+				stop: function(e, ui) {
+
+					var logEntry = $scope.sections.map(function(i){
+						return i.id;
+					}).join(', ');
+					console.log('Stop: ' + logEntry);
+				}
+			};
+
+			$scope.sections = $scope.$storage.sections;
+
+			$scope.counter = $scope.$storage.counter;
+
+			$scope.saveData = function(){
+				$scope.$storage.sections = $scope.sections;
+			} 
+
+			$scope.setFocusHere = function(el){
+				console.log(el)
+				$scope.$broadcast(el);
+			}
+
+			$scope.editItem = function (obj) {
+				//console.log(obj.target.next());
+				obj.target.setAttribute("contenteditable", true);
+				obj.target.focus();
+			};
+
+			$scope.editTitle = function () {
+				$scope.edit = true;
+				var myEl = document.getElementById('titleName');
+				var angularEl = angular.element(myEl);
+				$('#titleName').focus();
+				angularEl.focus();
+			};
+
+			$scope.calculatePercent = function (obj) {
+				obj.checkedCounter = 0;
+				for(i = 0; i< obj.rows.length; i++){
+					if(obj.rows[i].checked == true){
+						obj.checkedCounter++;
+					}
+				}
+
+				obj.currentPercent = Math.round((obj.checkedCounter * 100) / (obj.counter));
+				if(isNaN(obj.currentPercent)){
+					obj.currentPercent = 100;
+				}
+				
+				console.log("Checked Counter: " + obj.checkedCounter);
+				console.log("Total Counter: " + obj.counter);
+				console.log("Current Percent: " + obj.currentPercent);
+			};
+
+			$scope.addRow = function(obj) {
+
+				obj.counter++;
+				obj.totalCounter++;
+				obj.rows.push({
+					name: 'Row ' + obj.totalCounter, 
+					desc: 'Short description.', 
+					checked: 'false', 
+					index: obj.totalCounter
+				});
+				$scope.calculatePercent(obj);
+
+			};
+
+			$scope.removeRow = function(obj, index){
+				obj.rows.splice(index, 1);
+				obj.counter--;
+				$scope.calculatePercent(obj);
+			};  
+
+			$scope.addSection = function() {
+				$scope.$storage.counter++;
+				$scope.sections.push({ 
+					value: 0,
+					name: 'Title Name',
+					color: 'blue',
+					id: $scope.$storage.counter,
+					edit: false,
+					counter: 1,
+					totalCounter: 1,
+					checkedCounter: 0,
+					currentPercent: 0,
+					rows: [ { name: 'Row 1', desc: 'Short description.', checked: 'false', index: '1' }]
+				});
+
+				console.log($scope.sections);
+			};
+
+			$scope.removeSection = function(obj, index) {
+				$scope.sections.splice(index, 1);
+				$scope.counter--;
+			};
+
+			$scope.clearAll = function() {
+				$scope.$storage.counter = 0;
+				$scope.sections = [];
+				$scope.saveData();
+			};
+		})
+		.directive('contenteditable', ['$sce', function($sce) {
+			return {
+    restrict: 'A', // only activate on element attribute
+    require: '?ngModel', // get a hold of NgModelController
+    link: function(scope, element, attrs, ngModel) {
+      if (!ngModel) return; // do nothing if no ng-model
+
+      // Specify how UI should be updated
+      ngModel.$render = function() {
+      	element.html($sce.getTrustedHtml(ngModel.$viewValue || ''));
+      };
+
+      // Listen for change events to enable binding
+      element.on('blur keyup change', function() {
+      	scope.$evalAsync(read);
+      });
+      read(); // initialize
+
+      // Write data to the model
+      function read() {
+      	var html = element.html();
+        // When we clear the content editable the browser leaves a <br> behind
+        // If strip-br attribute is provided then we strip this out
+        if ( attrs.stripBr && html == '<br>' ) {
+        	html = '';
+        }
+        ngModel.$setViewValue(html);
+    }
+}
+};
+}])
+		.directive('myEnter', function () {
+			return function (scope, element, attrs) {
+				element.bind("keydown keypress", function (event) {
+					if(event.which === 13) {
+						scope.$apply(function (){
+							scope.$eval(attrs.myEnter);
+						});
+
+						event.preventDefault();
+					}
+				});
+			};
+		});
+	</script>
+</head>
+
+<body ng-controller="MainController">
+
+	<div class="container">
+		<h1>Checklist - Roy Vannakittikun</h1>
+		<p>A simple organized checklist/to-do list built with responsive web design and practical visuals to track your progress. All changes are saved into your local storage.</p>
+
+		<button type="button" class="btn btn-info btn-md" ng-click="addSection()">Add New Section</button>
+		<!-- <button type="button" class="btn btn-info btn-md" ng-click="saveData()">Save</button> -->
+		<button type="button" class="btn btn-danger btn-md" ng-click="clearAll()" confirm="Are you sure you want to clear all?">Clear All</button>
+		<br>
+		<br>
+		<div class="panel-group" id="accordion" ui-sortable="sortableOptions" ng-model="sections">
+
+			<div class="panel panel-primary" ng-repeat="section in sections" style="position: relative;">
+				<div class="myHandle btn btn-warning btn-xs">
+					<i class="glyphicon glyphicon-resize-vertical"></i>
+				</div>
+				<div class="panel-heading" ng-class="{
+				'color-blue': section.color === 'blue', 
+				'color-black': section.color === 'black',
+				'color-purple': section.color === 'purple',
+				'color-red': section.color === 'red',
+				'color-teal': section.color === 'teal',
+				'color-green': section.color === 'green',
+				'color-yellow': section.color === 'yellow',
+				'color-gray': section.color === 'gray'}">
+				<button type="button" class="btn btn-warning btn-xs" ng-click="section.edit = true; $broadcast('titleInput')" style="float: left; margin-right: 10px;">
+					<span class="glyphicon glyphicon-edit"></span>
+				</button>
+
+				<button type="button" class="btn btn-danger btn-xs" ng-click="removeSection(section, $index)" style="float: right; width: 24px;" confirm="Are you sure you want delete this section?">
+					X
+				</button>
+
+				<input my-enter="section.edit = false" ng-set-focus="titleInput" ng-show="section.edit == true" ng-blur="section.edit = false" id="titleName" class="panel-title" ng-model="section.name" size="17" maxlength="40" style="float: left; margin-right: 10px;" />
+				<a id="name" data-toggle="collapse" data-parent="#accordion" href="#collapse{{section.id}}" style="display: block;">
+					<span ng-show="!section.edit" class="panel-title">{{section.name}}</span>
+					<br>
+					<br>
+					<div class="progress">
+						<span class="progress-value">{{section.currentPercent}}%</span>
+						<div class="progress-bar progress-bar-info progress-bar-striped active" role="progressbar"
+						aria-valuenow="{{section.currentPercent}}" aria-valuemin="0" aria-valuemax="{{section.currentPercent}}" style="width:{{section.currentPercent}}%">
+
+					</div>
+				</div>
+
+			</a>
+		</div>
+
+		<div class="collapse" id="collapse{{section.id}}">
+			<table class="table table-hover">
+				<thead>
+					<tr>
+						<th class="col-sm-1"></th>
+						<th class="col-sm-3">Name</th>
+						<th class="col-sm-7">Description</th>
+						<th class="col-sm-1"></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="rowContent in section.rows" ng-attr-id="checked-{{ rowContent.checked }}">
+						<td><div class="custom-checkbox">
+							<input type="checkbox" id="{{section.id}}-{{rowContent.index}}" ng-model="rowContent.checked" ng-click="calculatePercent(section)">
+							<label for="{{section.id}}-{{rowContent.index}}">&nbsp;</label>
+						</div></td>
+						<td>
+							<!-- <span spellcheck="false" ng-click="editItem($event)">{{rowContent[0]}}</span> -->
+							<div contenteditable data-text="Enter text here" id="columnText" spellcheck="false" ng-model="rowContent.name" ng-click="editItem($event)"></div>
+
+						</td>
+
+						<td>
+							<!-- <span spellcheck="false" ng-click="editItem($event)">{{rowContent[0]}}</span> -->
+							<div contenteditable data-text="Enter text here" id="columnText" spellcheck="false" ng-model="rowContent.desc" ng-click="editItem($event)"></div>
+
+						</td>
+
+						<td>
+							<button style="display: block; margin: auto;" type="button" class="btn btn-danger btn-sm" ng-click="removeRow(section, $index)">X</button>
+							<!-- {{rowContent.index}} -->
+						</td>
+					</tr>
+
+				</tbody>
+			</table>
+
+			<div class="btn-group">
+				<button style="background-color: #337AB7 !important; width: 25px; height: 25px; margin-left: 10px; margin-bottom: 10px;" type="button" class="btn" ng-click="section.color = 'blue'"></button>
+				<button style="background-color: #9632b5 !important; width: 25px; height: 25px;" type="button" class="btn" ng-click="section.color = 'purple'"></button>
+				<button style="background-color: #b53232 !important; width: 25px; height: 25px;" type="button" class="btn" ng-click="section.color = 'red'"></button>
+				<button style="background-color: #32b5aa !important; width: 25px; height: 25px;" type="button" class="btn" ng-click="section.color = 'teal'"></button>
+				<button style="background-color: #32b53b !important; width: 25px; height: 25px;" type="button" class="btn" ng-click="section.color = 'green'"></button>
+				<button style="background-color: #EC971F !important; width: 25px; height: 25px;" type="button" class="btn" ng-click="section.color = 'yellow'"></button>
+				<button style="background-color: #898989 !important; width: 25px; height: 25px;" type="button" class="btn" ng-click="section.color = 'gray'"></button>
+				<button style="background-color: #262626 !important; width: 25px; height: 25px;" type="button" class="btn" ng-click="section.color = 'black'"></button>
+			</div>
+
+			<button type="button" class="btn btn-info btn-block" ng-click="addRow(section)">Add New Row</button>
+		</div>
+	</div>
+
+</div>
+
+
+</div>
+
+
+
+</body>
+
+</html>
